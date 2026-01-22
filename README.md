@@ -40,8 +40,7 @@ Fluxo lógico do sistema:
 ↓
 [ UX / Feedback Visual ]
 
-yaml
-Copiar código
+
 
 ---
 
@@ -79,8 +78,7 @@ pdv/
 ├─ .gitignore
 └─ README.md
 
-yaml
-Copiar código
+
 
 ---
 
