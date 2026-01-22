@@ -1,0 +1,1 @@
+console.log("PDV backend initialized");
