@@ -1,15 +1,14 @@
-const SaleService = require("../../application/SaleService");
+import SaleService from "../../application/SaleService.js";
 
 const saleService = new SaleService();
 
-class SaleController {
+export default class SaleController {
   createSale(req, res) {
     const sale = saleService.createSale();
 
     return res.status(201).json({
-      id: sale.id,
       items: sale.items,
-      total: sale.getTotal()
+      total: sale.total
     });
   }
 
@@ -24,9 +23,7 @@ class SaleController {
 
     return res.status(200).json({
       items: updatedSale.items,
-      total: updatedSale.getTotal()
+      total: updatedSale.total
     });
   }
 }
-
-module.exports = new SaleController();

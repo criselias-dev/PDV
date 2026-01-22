@@ -1,8 +1,16 @@
-const express = require('express');
+import express from 'express';
+import routes from './app/interfaces/http/routes.js';
 
 const app = express();
 const PORT = 3000;
 
+// Middleware
+app.use(express.json());
+
+// Rotas
+app.use('/api', routes);
+
+// Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -10,7 +18,7 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Start
 app.listen(PORT, () => {
   console.log(`PDV backend running on port ${PORT}`);
 });
-console.log("PDV backend initialized");
