@@ -1,22 +1,30 @@
-import Sale from "../domain/Sale.js";
-import Product from "../domain/Product.js";
+import SaleRepositoryInMemory from '../infrastructure/repositories/SaleRepositoryInMemory.js';
 
 export default class SaleService {
-  createSale() {
-    return new Sale();
+  constructor() {
+    this.saleRepository = new SaleRepositoryInMemory();
   }
 
-  addProductToSale(sale, productData, quantity) {
-    const product = new Product({
-      id: productData.id,
-      name: productData.name,
-      price: productData.price,
-      barcode: productData.barcode,
-      active: productData.active
-    });
+  createSale() {
+    return this.saleRepository.create();
+  }
 
-    sale.addItem(product, quantity);
+  addItem(saleId, product) {
+    const sale = this.saleRepository.findById(saleId);
+    if (!sale) throw new Error('Sale not found');
 
+    sale.items.push(product);
+    sale.total = sale.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    return this.saleRepository.save(sale);
+  }
+
+  getSale(saleId) {
+    const sale = this.saleRepository.findById(saleId);
+    if (!sale) throw new Error('Sale not found');
     return sale;
   }
 }

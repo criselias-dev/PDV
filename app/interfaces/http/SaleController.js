@@ -1,29 +1,35 @@
-import SaleService from "../../application/SaleService.js";
+import SaleService from '../../application/SaleService.js';
 
 const saleService = new SaleService();
 
-export default class SaleController {
-  createSale(req, res) {
+class SaleController {
+  create(req, res) {
     const sale = saleService.createSale();
-
-    return res.status(201).json({
-      items: sale.items,
-      total: sale.total
-    });
+    return res.status(201).json(sale);
   }
 
   addItem(req, res) {
-    const { sale, product, quantity } = req.body;
+    const { id } = req.params;
+    const product = req.body;
 
-    const updatedSale = saleService.addProductToSale(
-      sale,
-      product,
-      quantity
-    );
+    try {
+      const sale = saleService.addItem(id, product);
+      return res.status(200).json(sale);
+    } catch (err) {
+      return res.status(404).json({ error: err.message });
+    }
+  }
 
-    return res.status(200).json({
-      items: updatedSale.items,
-      total: updatedSale.total
-    });
+  get(req, res) {
+    const { id } = req.params;
+
+    try {
+      const sale = saleService.getSale(id);
+      return res.status(200).json(sale);
+    } catch (err) {
+      return res.status(404).json({ error: err.message });
+    }
   }
 }
+
+export default new SaleController();
