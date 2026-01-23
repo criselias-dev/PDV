@@ -11,3 +11,13 @@ CREATE TABLE IF NOT EXISTS sale_items (
   quantity INTEGER NOT NULL,
   FOREIGN KEY (sale_id) REFERENCES sales(id)
 );
+-- ===============================
+-- Tabela de produtos (estoque)
+-- ===============================
+CREATE TABLE IF NOT EXISTS products (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    stock_quantity INTEGER NOT NULL
+);
+
