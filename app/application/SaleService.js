@@ -1,30 +1,23 @@
-import SaleRepositoryInMemory from '../infrastructure/repositories/SaleRepositoryInMemory.js';
+// SaleService.js
+// Camada de lógica de negócio, agora persistente
+import { SaleRepository } from '../repositories/SaleRepository.js';
 
-export default class SaleService {
+export class SaleService {
   constructor() {
-    this.saleRepository = new SaleRepositoryInMemory();
+    this.repo = new SaleRepository();
   }
 
-  createSale() {
-    return this.saleRepository.create();
+  async createSale() {
+    return await this.repo.createSale();
   }
 
-  addItem(saleId, product) {
-    const sale = this.saleRepository.findById(saleId);
-    if (!sale) throw new Error('Sale not found');
-
-    sale.items.push(product);
-    sale.total = sale.items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-
-    return this.saleRepository.save(sale);
+  async addProductToSale(sale, product, quantity) {
+    await this.repo.addItem(sale.id, product, quantity);
+    // Retorna a venda atualizada
+    return await this.repo.getSale(sale.id);
   }
 
-  getSale(saleId) {
-    const sale = this.saleRepository.findById(saleId);
-    if (!sale) throw new Error('Sale not found');
-    return sale;
+  async getSale(saleId) {
+    return await this.repo.getSale(saleId);
   }
 }
