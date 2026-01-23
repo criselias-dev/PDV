@@ -1,7 +1,8 @@
 // SaleRepository.js
 // Camada de persistência: lida diretamente com o banco SQLite
 
-import { db } from '../infrastructure/database/connection.js';
+import { db } from '../database/connection.js';
+
 import { v4 as uuidv4 } from 'uuid';
 
 export class SaleRepository {

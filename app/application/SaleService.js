@@ -1,6 +1,7 @@
 // SaleService.js
 // Camada de lógica de negócio, agora persistente
-import { SaleRepository } from '../repositories/SaleRepository.js';
+import { SaleRepository } from '../infrastructure/repositories/SaleRepository.js';
+
 
 export class SaleService {
   constructor() {

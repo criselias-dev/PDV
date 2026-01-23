@@ -3,6 +3,8 @@
 
 import { SaleService } from '../../application/SaleService.js';
 
+
+
 const saleService = new SaleService();
 
 export class SaleController {
