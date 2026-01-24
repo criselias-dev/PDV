@@ -27,11 +27,8 @@ export class SaleService {
       await this.productRepo.decreaseStock(product.id, quantity);
 
       // 🧾 registra item da venda
-      await this.saleRepo.addItem(
-        saleId,
-        product,
-        quantity
-      );
+      await this.saleRepo.addItem(saleId, product, quantity);
+
 
       await db.exec('COMMIT');
 
@@ -43,13 +40,55 @@ export class SaleService {
   }
 
   async getSale(saleId) {
-    return await this.saleRepo.getSale(saleId);
+    const sale = await this.saleRepo.getSale(saleId);
+
+    let total = 0;
+
+    for (const item of sale.items) {
+      total += item.price * item.quantity;
+    }
+
+    sale.total = Number(total.toFixed(2));
+
+    return sale;
   }
 
   // Lista todas as vendas
-async listAllSales() {
-  return await this.saleRepo.getAllSales();
+  async listAllSales() {
+    return await this.saleRepo.getAllSales();
+  }
+  /**
+   * Lista vendas realizadas dentro de um período
+   * @param {string} start - Data inicial no formato 'YYYY-MM-DD'
+   * @param {string} end - Data final no formato 'YYYY-MM-DD'
+   * @returns {Promise<Array>} - Lista de vendas com itens
+   */
+  async listSalesByPeriod(start, end) {
+    if (!start || !end) {
+      throw new Error('Start and end dates must be provided');
+    }
+
+    const startDate = `${start} 00:00:00`;
+    const endDate = `${end} 23:59:59`;
+
+    // Busca todas as vendas no período
+    const sales = await db.all(
+      'SELECT * FROM sales WHERE created_at BETWEEN ? AND ? ORDER BY created_at ASC',
+      [startDate, endDate]
+    );
+
+    // Adiciona os itens de cada venda
+    for (const sale of sales) {
+      const items = await db.all(
+        'SELECT product_id,product_name, price, quantity FROM sale_items WHERE sale_id = ?',
+        [sale.id]
+      );
+      sale.items = items;
+    }
+
+    return sales;
+  }
 }
 
-}
+
 

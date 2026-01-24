@@ -29,7 +29,7 @@ export class SaleRepository {
   }
 
  // Adiciona um item a uma venda existente (agora com product_id)
-async addItem(saleId, productId, quantity) {
+async addItem(saleId, product, quantity) {
   await db.run(
     'INSERT INTO sale_items (sale_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)',
     [saleId, product.id, product.name, product.price, quantity]
@@ -75,6 +75,36 @@ async getAllSales() {
   }
 
   return result;
+}
+
+// Retorna todas as vendas, opcionalmente filtrando por período
+async listSales(startDate, endDate) {
+  let query = 'SELECT * FROM sales';
+  const params = [];
+
+  if (startDate && endDate) {
+    query += ' WHERE date(created_at) BETWEEN date(?) AND date(?)';
+    params.push(startDate, endDate);
+  } else if (startDate) {
+    query += ' WHERE date(created_at) >= date(?)';
+    params.push(startDate);
+  } else if (endDate) {
+    query += ' WHERE date(created_at) <= date(?)';
+    params.push(endDate);
+  }
+
+  const sales = await db.all(query, params);
+
+  // adiciona os itens a cada venda
+  for (const sale of sales) {
+    const items = await db.all(
+      'SELECT product_name, price, quantity FROM sale_items WHERE sale_id = ?',
+      [sale.id]
+    );
+    sale.items = items;
+  }
+
+  return sales;
 }
 
 }
