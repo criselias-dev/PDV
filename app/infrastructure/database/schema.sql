@@ -3,7 +3,8 @@
 -- ===============================
 CREATE TABLE IF NOT EXISTS sales (
   id TEXT PRIMARY KEY,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  status TEXT NOT NULL DEFAULT 'OPEN'
 );
 
 -- ===============================

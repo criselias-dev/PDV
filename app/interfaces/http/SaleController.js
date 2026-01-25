@@ -49,4 +49,18 @@ export class SaleController {
       return res.status(500).json({ message: err.message });
     }
   }
+
+  // Fecha uma venda
+  async closeSale(req, res) {
+    try {
+      const { id } = req.params;
+      if (!id) return res.status(400).json({ message: 'Sale ID is required' });
+
+      const closedSale = await saleService.closeSale(id);
+      return res.status(200).json(closedSale);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+
 }

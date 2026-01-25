@@ -23,6 +23,8 @@ const saleService = new SaleService();  // necessário para a rota /sales
 router.post('/sales', (req, res) => saleController.createSale(req, res));
 router.post('/sales/items', (req, res) => saleController.addItem(req, res));
 router.get('/sales/:id', (req, res) => saleController.getSale(req, res));
+// Fecha uma venda
+router.post('/sales/:id/close', (req, res) => saleController.closeSale(req, res));
 
 
 // ===============================
@@ -32,7 +34,6 @@ router.post('/products', (req, res) => productController.create(req, res));
 router.get('/products', (req, res) => productController.list(req, res));
 router.get('/products/:id', (req, res) => productController.get(req, res));
 
-export default router;
 
 // Lista todas as vendas, com filtro opcional por período
 // Ex.: /api/sales?start=2026-01-24&end=2026-01-24
@@ -57,3 +58,4 @@ router.get('/sales', async (req, res) => {
   }
 });
 
+export default router;
