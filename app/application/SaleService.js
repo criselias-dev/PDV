@@ -8,29 +8,44 @@ export class SaleService {
     this.saleRepo = new SaleRepository();
     this.productRepo = new ProductRepository();
   }
-
+  // ===============================
+  // Calcula o total apenas de itens ativos
+  // ===============================
+  calculateTotal(items) {
+    return Number(
+      items
+        .filter(item => item.status === 'ACTIVE') // só considera itens ativos
+        .reduce((sum, item) => sum + item.price * item.quantity, 0)
+        .toFixed(2)
+    );
+  }
+  // ===============================
+  // Cria nova venda
+  // ===============================
   async createSale() {
     return await this.saleRepo.createSale();
   }
-
+  // ===============================
+  // Adiciona produto à venda
+  // ===============================
   async addProductToSale(saleId, productId, quantity) {
     await db.exec('BEGIN TRANSACTION');
 
-   try {
-    // ✅ verifica se a venda existe e está aberta
-    const sale = await this.saleRepo.getSale(saleId);
-    if (!sale) {
-      throw new Error('Sale not found');
-    }
-    if (sale.status !== 'OPEN') {
-      throw new Error('Cannot add items to a closed sale');
-    }
+    try {
+      // ✅ verifica se a venda existe e está aberta
+      const sale = await this.saleRepo.getSale(saleId);
+      if (!sale) {
+        throw new Error('Sale not found');
+      }
+      if (sale.status !== 'OPEN') {
+        throw new Error('Cannot add items to a closed sale');
+      }
 
-    const product = await this.productRepo.getProductById(productId);
+      const product = await this.productRepo.getProductById(productId);
 
-    if (!product) {
-      throw new Error('Produto não encontrado');
-    }
+      if (!product) {
+        throw new Error('Produto não encontrado');
+      }
 
       // 🔒 baixa de estoque correta (com validação)
       await this.productRepo.decreaseStock(product.id, quantity);
@@ -41,7 +56,51 @@ export class SaleService {
 
       await db.exec('COMMIT');
 
-      return await this.saleRepo.getSale(saleId);
+      const updatedSale = await this.saleRepo.getSale(saleId);
+      updatedSale.total = this.calculateTotal(updatedSale.items);
+      return updatedSale;
+
+    } catch (err) {
+      await db.exec('ROLLBACK');
+      throw err;
+    }
+  }
+
+  // ===============================
+  // Cancela um item da venda
+  // ===============================
+  async cancelItem(saleId, productId) {
+    await db.exec('BEGIN TRANSACTION');
+
+    try {
+      const sale = await this.saleRepo.getSale(saleId);
+      if (!sale) throw new Error('Sale not found');
+      if (sale.status !== 'OPEN') throw new Error('Cannot cancel item from a closed sale');
+
+      const item = sale.items.find(i => String(i.product_id) === String(productId) && i.status === 'ACTIVE');
+      if (!item) throw new Error('Item not found or already cancelled');
+
+      // Marca o item como cancelado
+      await db.run(
+        'UPDATE sale_items SET status = ? WHERE sale_id = ? AND product_id = ?',
+        ['CANCELLED', saleId, productId]
+      );
+
+      // Recalcula o total da venda sem afetar o estoque
+      const updatedItems = (await this.saleRepo.getSale(saleId)).items;
+
+      const total = this.calculateTotal(updatedItems);
+
+      await db.run(
+        'UPDATE sales SET total = ? WHERE id = ?',
+        [total, saleId]
+      );
+
+      await db.exec('COMMIT');
+
+      const updatedSale = await this.saleRepo.getSale(saleId);
+      updatedSale.total = total;
+      return updatedSale;
     } catch (err) {
       await db.exec('ROLLBACK');
       throw err;
@@ -51,52 +110,65 @@ export class SaleService {
   async getSale(saleId) {
     const sale = await this.saleRepo.getSale(saleId);
 
-    let total = 0;
-
-    for (const item of sale.items) {
-      total += item.price * item.quantity;
-    }
-
-    sale.total = Number(total.toFixed(2));
-
-    return sale;
-  }
-
-  async closeSale(saleId) {
-  await db.exec('BEGIN TRANSACTION');
-
-  try {
-    const sale = await this.saleRepo.getSale(saleId);
-
     if (!sale) {
       throw new Error('Sale not found');
     }
 
-    if (sale.status !== 'OPEN') {
-      throw new Error('Sale is already closed');
-    }
+    sale.total = this.calculateTotal(sale.items);
 
-    await db.run(
-      'UPDATE sales SET status = ? WHERE id = ?',
-      ['CLOSED', saleId]
-    );
 
-    await db.exec('COMMIT');
-
-    sale.status = 'CLOSED';
     return sale;
-  } catch (err) {
-    await db.exec('ROLLBACK');
-    throw err;
   }
-}
+  // ===============================
+  // Fecha a venda
+  // ===============================
+  async closeSale(saleId) {
+    await db.exec('BEGIN TRANSACTION');
 
-  
+    try {
+      const sale = await this.saleRepo.getSale(saleId);
+
+      if (!sale) {
+        throw new Error('Sale not found');
+      }
+
+      if (sale.status !== 'OPEN') {
+        throw new Error('Sale is already closed');
+      }
+
+      // 🔒 cálculo final e definitivo do total (blindagem)
+      const total = this.calculateTotal(sale.items);
+
+      await db.run(
+        'UPDATE sales SET status = ?, total = ? WHERE id = ?',
+        ['CLOSED', total, saleId]
+      );
+
+      await db.exec('COMMIT');
+
+      sale.status = 'CLOSED';
+      sale.total = total;
+
+      return sale;
+    } catch (err) {
+      await db.exec('ROLLBACK');
+      throw err;
+    }
+  }
 
   // Lista todas as vendas
   async listAllSales() {
-    return await this.saleRepo.getAllSales();
+    const sales = await this.saleRepo.getAllSales();
+
+    for (const sale of sales) {
+      if (sale.status !== 'CLOSED') {
+        sale.total = this.calculateTotal(sale.items);
+      }
+    }
+
+    return sales;
   }
+
   /**
    * Lista vendas realizadas dentro de um período
    * @param {string} start - Data inicial no formato 'YYYY-MM-DD'
@@ -111,23 +183,29 @@ export class SaleService {
     const startDate = `${start} 00:00:00`;
     const endDate = `${end} 23:59:59`;
 
-    // Busca todas as vendas no período
     const sales = await db.all(
       'SELECT * FROM sales WHERE created_at BETWEEN ? AND ? ORDER BY created_at ASC',
       [startDate, endDate]
     );
 
-    // Adiciona os itens de cada venda
     for (const sale of sales) {
       const items = await db.all(
-        'SELECT product_id,product_name, price, quantity FROM sale_items WHERE sale_id = ?',
+         'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
         [sale.id]
       );
+
       sale.items = items;
+
+
+      // ✅ só recalcula se a venda ainda estiver aberta
+      if (sale.status !== 'CLOSED') {
+        sale.total = this.calculateTotal(items);
+      }
     }
 
     return sales;
   }
+
 }
 
 

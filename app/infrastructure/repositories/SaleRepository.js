@@ -28,13 +28,13 @@ export class SaleRepository {
     return { id, items: [] };
   }
 
- // Adiciona um item a uma venda existente (agora com product_id)
-async addItem(saleId, product, quantity) {
-  await db.run(
-    'INSERT INTO sale_items (sale_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)',
-    [saleId, product.id, product.name, product.price, quantity]
-  );
-}
+  // Adiciona um item a uma venda existente (agora com product_id)
+  async addItem(saleId, product, quantity) {
+    await db.run(
+      'INSERT INTO sale_items (sale_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)',
+      [saleId, product.id, product.name, product.price, quantity]
+    );
+  }
 
 
   // --------------------------------------------------
@@ -48,10 +48,10 @@ async addItem(saleId, product, quantity) {
 
     if (!sale) return null;
 
-   const items = await db.all(
-  'SELECT product_id, product_name, price, quantity FROM sale_items WHERE sale_id = ?',
-  [saleId]
-);
+    const items = await db.all(
+      'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
+      [saleId]
+    );
 
 
     return {
@@ -61,50 +61,50 @@ async addItem(saleId, product, quantity) {
   }
 
   // Retorna todas as vendas com seus itens
-async getAllSales() {
-  const sales = await db.all('SELECT * FROM sales');
+  async getAllSales() {
+    const sales = await db.all('SELECT * FROM sales');
 
-  const result = [];
+    const result = [];
 
-  for (const sale of sales) {
-    const items = await db.all(
-      'SELECT product_id, product_name, price, quantity FROM sale_items WHERE sale_id = ?',
-      [sale.id]
-    );
-    result.push({ ...sale, items });
+    for (const sale of sales) {
+      const items = await db.all(
+        'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
+        [sale.id]
+      );
+      result.push({ ...sale, items });
+    }
+
+    return result;
   }
 
-  return result;
-}
+  // Retorna todas as vendas, opcionalmente filtrando por período
+  async listSales(startDate, endDate) {
+    let query = 'SELECT * FROM sales';
+    const params = [];
 
-// Retorna todas as vendas, opcionalmente filtrando por período
-async listSales(startDate, endDate) {
-  let query = 'SELECT * FROM sales';
-  const params = [];
+    if (startDate && endDate) {
+      query += ' WHERE date(created_at) BETWEEN date(?) AND date(?)';
+      params.push(startDate, endDate);
+    } else if (startDate) {
+      query += ' WHERE date(created_at) >= date(?)';
+      params.push(startDate);
+    } else if (endDate) {
+      query += ' WHERE date(created_at) <= date(?)';
+      params.push(endDate);
+    }
 
-  if (startDate && endDate) {
-    query += ' WHERE date(created_at) BETWEEN date(?) AND date(?)';
-    params.push(startDate, endDate);
-  } else if (startDate) {
-    query += ' WHERE date(created_at) >= date(?)';
-    params.push(startDate);
-  } else if (endDate) {
-    query += ' WHERE date(created_at) <= date(?)';
-    params.push(endDate);
+    const sales = await db.all(query, params);
+
+    // adiciona os itens a cada venda
+    for (const sale of sales) {
+      const items = await db.all(
+        'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
+        [sale.id]
+      );
+      sale.items = items;
+    }
+
+    return sales;
   }
-
-  const sales = await db.all(query, params);
-
-  // adiciona os itens a cada venda
-  for (const sale of sales) {
-    const items = await db.all(
-      'SELECT product_name, price, quantity FROM sale_items WHERE sale_id = ?',
-      [sale.id]
-    );
-    sale.items = items;
-  }
-
-  return sales;
-}
 
 }
