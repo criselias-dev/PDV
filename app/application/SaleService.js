@@ -62,39 +62,36 @@ export class SaleService {
     return sale;
   }
 
-   async closeSale(saleId) {
-    await db.exec('BEGIN TRANSACTION');
+  async closeSale(saleId) {
+  await db.exec('BEGIN TRANSACTION');
 
-    try {
-      const sale = await this.saleRepo.getSale(saleId);
+  try {
+    const sale = await this.saleRepo.getSale(saleId);
 
-      if (!sale) {
-        throw new Error('Sale not found');
-      }
-
-      if (sale.status !== 'OPEN') {
-        throw new Error('Sale is already closed');
-      }
-
-      let total = 0;
-      for (const item of sale.items) {
-        total += item.price * item.quantity;
-      }
-      sale.total = Number(total.toFixed(2));
-
-      await db.run(
-        'UPDATE sales SET status = ?, total = ? WHERE id = ?',
-        ['COMPLETED', sale.total, saleId]
-      );
-
-      await db.exec('COMMIT');
-
-      return sale;
-    } catch (err) {
-      await db.exec('ROLLBACK');
-      throw err;
+    if (!sale) {
+      throw new Error('Sale not found');
     }
+
+    if (sale.status !== 'OPEN') {
+      throw new Error('Sale is already closed');
+    }
+
+    await db.run(
+      'UPDATE sales SET status = ? WHERE id = ?',
+      ['CLOSED', saleId]
+    );
+
+    await db.exec('COMMIT');
+
+    sale.status = 'CLOSED';
+    return sale;
+  } catch (err) {
+    await db.exec('ROLLBACK');
+    throw err;
   }
+}
+
+  
 
   // Lista todas as vendas
   async listAllSales() {
