@@ -46,4 +46,27 @@ export class ProductRepository {
       [quantity, id]
     );
   }
+
+    // 🔥 MÉTODO PARA REABASTECIMENTO
+  // Aumenta estoque de um produto existente
+  async increaseStock(id, quantity) {
+    const product = await this.getProductById(id);
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    if (quantity <= 0) {
+      throw new Error('Quantity must be greater than zero');
+    }
+
+    await db.run(
+      'UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?',
+      [quantity, id]
+    );
+
+    // Retorna produto atualizado
+    return await this.getProductById(id);
+  }
+
 }

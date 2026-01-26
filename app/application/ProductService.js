@@ -20,4 +20,20 @@ export class ProductService {
   async updateStock(id, quantity) {
     return await this.repo.updateStock(id, quantity);
   }
+  // ===============================
+  // Reabastece (aumenta) o estoque de um produto existente
+  // ===============================
+  async restockProduct(id, quantity) {
+    const product = await this.repo.getProductById(id);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    const newQuantity = product.stock_quantity + quantity;
+    await this.repo.updateStock(id, newQuantity);
+
+    // Retorna o produto atualizado
+    return { ...product, stock_quantity: newQuantity };
+  }
+
 }

@@ -85,6 +85,12 @@ export class SaleService {
         'UPDATE sale_items SET status = ? WHERE sale_id = ? AND product_id = ?',
         ['CANCELLED', saleId, productId]
       );
+      // 🔄 devolve a quantidade cancelada ao estoque
+    const product = await this.productRepo.getProductById(productId);
+    if (product) {
+      const newStock = product.stock_quantity + item.quantity;
+      await this.productRepo.updateStock(productId, newStock);
+    }
 
       // Recalcula o total da venda sem afetar o estoque
       const updatedItems = (await this.saleRepo.getSale(saleId)).items;

@@ -20,4 +20,23 @@ export class ProductController {
     if (!product) return res.status(404).json({ message: 'Product not found' });
     return res.status(200).json(product);
   }
+    // ===============================
+  // Reabastece um produto existente
+  // ===============================
+  async restock(req, res) {
+    try {
+      const { id } = req.params;
+      const { quantity } = req.body;
+
+      if (!quantity || quantity <= 0) {
+        return res.status(400).json({ message: 'Quantity must be greater than zero' });
+      }
+
+      const updatedProduct = await productService.restockProduct(id, quantity);
+      return res.status(200).json(updatedProduct);
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
 }
