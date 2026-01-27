@@ -86,11 +86,8 @@ export class SaleService {
         ['CANCELLED', saleId, productId]
       );
       // 🔄 devolve a quantidade cancelada ao estoque
-    const product = await this.productRepo.getProductById(productId);
-    if (product) {
-      const newStock = product.stock_quantity + item.quantity;
-      await this.productRepo.updateStock(productId, newStock);
-    }
+      await this.productRepo.increaseStock(productId, item.quantity);
+      const updatedProduct = await this.productRepo.getProductById(productId); // agora pega o estoque atualizado
 
       // Recalcula o total da venda sem afetar o estoque
       const updatedItems = (await this.saleRepo.getSale(saleId)).items;
@@ -196,7 +193,7 @@ export class SaleService {
 
     for (const sale of sales) {
       const items = await db.all(
-         'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
+        'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
         [sale.id]
       );
 
