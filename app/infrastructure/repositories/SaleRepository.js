@@ -31,9 +31,12 @@ export class SaleRepository {
   // Adiciona um item a uma venda existente (agora com product_id)
   async addItem(saleId, product, quantity) {
     await db.run(
-      'INSERT INTO sale_items (sale_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)',
-      [saleId, product.id, product.name, product.price, quantity]
-    );
+  `INSERT INTO sale_items 
+   (sale_id, product_id, product_name, price, quantity, status) 
+   VALUES (?, ?, ?, ?, ?, 'ACTIVE')`,
+  [saleId, product.id, product.name, product.price, quantity]
+);
+
   }
 
 
@@ -49,9 +52,9 @@ export class SaleRepository {
     if (!sale) return null;
 
     const items = await db.all(
-      'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
-      [saleId]
-    );
+  'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ? ORDER BY id ASC',
+  [saleId]
+);
 
 
     return {
@@ -68,9 +71,10 @@ export class SaleRepository {
 
     for (const sale of sales) {
       const items = await db.all(
-        'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
-        [sale.id]
-      );
+  'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ? ORDER BY id ASC',
+  [sale.id]
+);
+
       result.push({ ...sale, items });
     }
 
@@ -97,10 +101,11 @@ export class SaleRepository {
 
     // adiciona os itens a cada venda
     for (const sale of sales) {
-      const items = await db.all(
-        'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ?',
-        [sale.id]
-      );
+     const items = await db.all(
+  'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ? ORDER BY id ASC',
+  [sale.id]
+);
+
       sale.items = items;
     }
 

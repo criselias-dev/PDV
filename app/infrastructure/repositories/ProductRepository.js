@@ -23,12 +23,7 @@ export class ProductRepository {
     return await db.get('SELECT * FROM products WHERE id = ?', [id]);
   }
 
-  // Atualiza estoque de um produto
-  async updateStock(id, newQuantity) {
-    await db.run('UPDATE products SET stock_quantity = ? WHERE id = ?', [newQuantity, id]);
-  }
-
-  // 🔥 MÉTODO CRÍTICO PARA VENDAS
+    // 🔥 MÉTODO CRÍTICO PARA VENDAS
   // Diminui estoque com validação (nunca negativo)
   async decreaseStock(id, quantity) {
     const product = await this.getProductById(id);
