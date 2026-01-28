@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDV</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+</head>
+
+<body>
+
+    <div id="app">
+        <header>
+            <h1>PDV</h1>
+        </header>
+
+        <main>
+            <section id="sale-panel">
+                <h2>Venda</h2>
+
+                <div class="product-input">
+                    <label for="product-code">Código do produto</label>
+                    <input type="text" id="product-code" placeholder="Digite ou bipa o código" autocomplete="off" />
+                </div>
+
+                <div class="sale-info">
+                    <span>Venda atual</span>
+                    <strong id="sale-total">R$ 0,00</strong>
+                </div>
+
+                <div class="sale-items">
+                    <p class="empty">Nenhum item adicionado</p>
+                </div>
+
+
+            </section>
+
+
+        </main>
+    </div>
+
+    <script src="./scripts/ui.js"></script>
+</body>
+
+</html>
