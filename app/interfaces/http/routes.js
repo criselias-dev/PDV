@@ -32,23 +32,9 @@ router.get('/products/:id', (req, res) => productController.get(req, res));
 
 // ===============================
 // Reabastece (restock) um produto existente
-// Ex.: POST /api/products/:id/restock
-// Body: { "quantity": 10 }
 // ===============================
-router.post('/products/:id/restock', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { quantity } = req.body;
 
-    if (!quantity || quantity <= 0) {
-      return res.status(400).json({ message: 'Quantity must be greater than zero' });
-    }
+router.post('/products/:id/restock', (req, res) => productController.restock(req, res));
 
-    const updatedProduct = await productService.restockProduct(id, Number(quantity));
-    return res.status(200).json(updatedProduct);
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-});
 
 export default router;

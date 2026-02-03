@@ -12,11 +12,22 @@ const saleService = new SaleService();
 router.post('/', async (req, res) => {
   try {
     const sale = await saleService.createSale();
-    return res.status(201).json(sale);
+
+    // ✅ PATCH ADICIONADO: garantir que o ID existe
+    if (!sale || !sale.id) {
+      console.error('Venda criada sem ID:', sale);
+      return res.status(500).json({ message: 'Venda criada sem ID' });
+    }
+
+    console.log('Venda criada no backend:', sale); // 👈 log para debug
+    return res.status(201).json(sale); // ✅ envia { id, items: [] }
+
   } catch (err) {
+    console.error(err); // 👈 log completo do erro
     return res.status(500).json({ message: err.message });
   }
 });
+
 
 // ===============================
 // Adiciona um item à venda

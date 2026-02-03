@@ -18,15 +18,14 @@ export class SaleRepository {
   // A venda nasce SEM itens e SEM total calculado
   // --------------------------------------------------
   async createSale() {
-    const id = uuidv4();
+  const id = uuidv4();
+  await db.run('INSERT INTO sales (id) VALUES (?)', [id]);
 
-    await db.run(
-      'INSERT INTO sales (id) VALUES (?)',
-      [id]
-    );
+  const sale = { id, items: [] };
+  console.log('SaleRepository.createSale ->', sale); // 👈 log para confirmar
+  return sale;
+}
 
-    return { id, items: [] };
-  }
 
   // Adiciona um item a uma venda existente (agora com product_id)
   async addItem(saleId, product, quantity) {

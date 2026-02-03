@@ -23,8 +23,11 @@ export class SaleService {
   // Cria nova venda
   // ===============================
   async createSale() {
-    return await this.saleRepo.createSale();
-  }
+  const sale = await this.saleRepo.createSale();
+  console.log('SaleService.createSale ->', sale); // 👈 log do serviço
+  return sale; // ✅ retorna { id, items: [] } para o controller
+}
+
   // ===============================
   // Adiciona produto à venda
   // ===============================

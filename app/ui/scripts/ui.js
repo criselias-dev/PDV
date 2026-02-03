@@ -1,32 +1,71 @@
-// ui.js — camada de interface (estado e eventos)
+window.addEventListener('load', () => {
+  console.log('ui.js executando imediatamente');
 
-document.addEventListener('DOMContentLoaded', () => {
-  const productInput = document.getElementById('product-code');
-  const saleItems = document.querySelector('.sale-items');
-  const saleTotal = document.getElementById('sale-total');
+  const btnStart = document.getElementById('btnStart');
+  const btnFinish = document.getElementById('btnFinish');
+  const productInput = document.getElementById('productInput');
 
-  // foco automático no campo de código
-  productInput.focus();
+  let currentSaleId = null;
 
-  productInput.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter') return;
+  // estado inicial
+  btnFinish.disabled = true;
+  productInput.disabled = true;
 
-    const code = productInput.value.trim();
-    if (!code) return;
+  // =========================
+  // INICIAR VENDA
+  // =========================
+  btnStart.addEventListener('click', async () => {
+    console.log('Clicou em iniciar venda');
 
-    // remove mensagem "Nenhum item"
-    const empty = saleItems.querySelector('.empty');
-    if (empty) empty.remove();
+    try {
+      const res = await fetch('http://127.0.0.1:3000/api/sales', { method: 'POST' });
 
-    // cria linha do item
-    const item = document.createElement('div');
-    item.textContent = `Produto código: ${code}`;
-    item.style.padding = '6px 0';
-    item.style.fontSize = '0.9rem';
 
-    saleItems.appendChild(item);
+      if (!res.ok) {
+        throw new Error('Erro ao iniciar venda: ' + res.status);
+      }
 
-    productInput.value = '';
-    productInput.focus();
+      const sale = await res.json();
+      currentSaleId = sale.id;
+
+      // ✅ Habilita botão finalizar e input, desabilita iniciar
+      btnStart.disabled = true;
+      btnFinish.disabled = false;
+      productInput.disabled = false;
+      productInput.focus();
+
+      console.log('Venda iniciada:', currentSaleId);
+    } catch (err) {
+      console.error('Erro iniciar venda:', err.message);
+    }
   });
+
+  // =========================
+  // FINALIZAR VENDA
+  // =========================
+  btnFinish.addEventListener('click', async () => {
+    if (!currentSaleId) return;
+
+    try {
+      const res = await fetch(`http://127.0.0.1:3000/api/sales/${currentSaleId}/close`, { method: 'POST' });
+
+
+      if (!res.ok) {
+        throw new Error('Erro ao finalizar venda: ' + res.status);
+      }
+
+      currentSaleId = null;
+
+      btnStart.disabled = false;
+      btnFinish.disabled = true;
+      productInput.disabled = true;
+      productInput.value = '';
+
+      console.log('Venda finalizada');
+    } catch (err) {
+      console.error('Erro finalizar venda:', err.message);
+    }
+  });
+
+  console.log('UI pronto para interação');
 });

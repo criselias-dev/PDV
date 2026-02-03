@@ -8,6 +8,7 @@
 // ===============================
 
 import express from 'express';
+import cors from 'cors';
 
 // Rotas HTTP (camada de interface)
 import routes from './app/interfaces/http/routes.js';
@@ -27,6 +28,10 @@ const PORT = 3000;
 
 // Permite receber JSON no body das requisições
 app.use(express.json());
+
+// Permite requisições cross-origin (CORS)
+// ⚠️ TEM QUE VIR ANTES DAS ROTAS
+app.use(cors());
 
 // ===============================
 // Inicialização da infraestrutura
