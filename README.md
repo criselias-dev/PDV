@@ -47,36 +47,45 @@ Fluxo lógico do sistema:
 ## 📂 Estrutura de Pastas
 
 pdv/
-├─ app/
-│ ├─ backend/
-│ │ ├─ server.js # Servidor local (Express)
-│ │ ├─ db.js # Conexão com banco local
-│ │ ├─ products.js # Regras de produto
-│ │ ├─ sales.js # Regras de venda
-│ │ └─ fiscal.js # Camada fiscal (futuro)
-│ │
-│ ├─ ui/
-│ │ ├─ index.html # Interface principal
-│ │ ├─ styles/
-│ │ │ ├─ base.css
-│ │ │ ├─ layout.css
-│ │ │ ├─ components.css
-│ │ │ └─ theme.css
-│ │ └─ scripts/
-│ │ ├─ ui.js # Lógica de interface
-│ │ └─ state.js # Estado da UI
-│ │
-│ └─ shared/
-│ ├─ constants.js
-│ └─ utils.js
+app/
 │
-├─ database/
-│ └─ pdv.sqlite # Banco local (SQLite)
+├── backend/
+│   ├── src/
+│   │   ├── application/
+│   │   │   ├── SaleService.js
+│   │   │   └── ProductService.js (futuro)
+│   │   │
+│   │   ├── domain/
+│   │   │   ├── Sale.js (opcional)
+│   │   │   └── Product.js (opcional)
+│   │   │
+│   │   ├── infrastructure/
+│   │   │   ├── database/
+│   │   │   │   ├── connection.js
+│   │   │   │   └── migrations.sql
+│   │   │   ├── repositories/
+│   │   │   │   ├── SaleRepository.js
+│   │   │   │   └── ProductRepository.js
+│   │   │   └── http/
+│   │   │       ├── controllers/
+│   │   │       │   ├── saleController.js
+│   │   │       │   └── productController.js
+│   │   │       └── routes.js
+│   │   │
+│   │   └── main.js
+│   │
+│   ├── package.json
+│   └── README.md
 │
-├─ main.js # Entrada principal (Node / Electron)
-├─ package.json
-├─ .gitignore
-└─ README.md
+├── ui/
+│   ├── css/
+│   │   └── main.css
+│   ├── js/
+│   │   └── ui.js
+│   ├── index.html
+│   └── README.md
+│
+└── README.md
 
 
 
@@ -101,9 +110,10 @@ pdv/
 - ✅ Estrutura de pastas definida
 - ✅ Backend inicial funcionando
 - ✅ Express configurado
-- 🔜 Banco de dados
-- 🔜 UI
-- 🔜 Integração completa
+- ✅ Banco de dados implementado
+- ✅ UI funcional
+- ✅ Integração completa (UI ↔ Backend ↔ DB)
+- ✅ -  MLP do PDV concluído
 
 ---
 

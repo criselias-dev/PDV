@@ -38,7 +38,6 @@ export class SaleRepository {
 
   }
 
-
   // --------------------------------------------------
   // Recupera uma venda com seus itens
   // --------------------------------------------------
@@ -54,7 +53,6 @@ export class SaleRepository {
   'SELECT product_id, product_name, price, quantity, status FROM sale_items WHERE sale_id = ? ORDER BY id ASC',
   [saleId]
 );
-
 
     return {
       ...sale,
