@@ -45,48 +45,32 @@ Fluxo lógico do sistema:
 ---
 
 ## 📂 Estrutura de Pastas
-
+```text
 pdv/
-app/
+├── app/
+│   ├── application/
+│   ├── backend/
+│   ├── domain/
+│   ├── infrastructure/
+│   │   ├── database/
+│   │   └── repositories/
+│   ├── interfaces/
+│   │   └── http/
+│   ├── shared/
+│   └── ui/
+│       ├── scripts/
+│       ├── styles/
+│       └── index.html
 │
-├── backend/
-│   ├── src/
-│   │   ├── application/
-│   │   │   ├── SaleService.js
-│   │   │   └── ProductService.js (futuro)
-│   │   │
-│   │   ├── domain/
-│   │   │   ├── Sale.js (opcional)
-│   │   │   └── Product.js (opcional)
-│   │   │
-│   │   ├── infrastructure/
-│   │   │   ├── database/
-│   │   │   │   ├── connection.js
-│   │   │   │   └── migrations.sql
-│   │   │   ├── repositories/
-│   │   │   │   ├── SaleRepository.js
-│   │   │   │   └── ProductRepository.js
-│   │   │   └── http/
-│   │   │       ├── controllers/
-│   │   │       │   ├── saleController.js
-│   │   │       │   └── productController.js
-│   │   │       └── routes.js
-│   │   │
-│   │   └── main.js
-│   │
-│   ├── package.json
-│   └── README.md
-│
-├── ui/
-│   ├── css/
-│   │   └── main.css
-│   ├── js/
-│   │   └── ui.js
-│   ├── index.html
-│   └── README.md
-│
+├── database/
+├── node_modules/
+├── main.js
+├── package.json
+├── package-lock.json
+├── pdv.sqlite
+├── .gitignore
 └── README.md
-
+```
 
 
 ---
