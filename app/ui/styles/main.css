@@ -1,0 +1,131 @@
+/* Fonte monoespaçada para vibe de terminal */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+  font-family: "Fira Code", "Consolas", monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  padding-top: 40px;
+}
+
+/* Título */
+h1 {
+  color: #00ff9d;
+  text-shadow: 0 0 8px #00ff9d;
+  margin-bottom: 30px;
+}
+/* Container dos botões */
+.controls {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Botões estilo neon */
+button {
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: bold;
+  border: 2px solid #00ff9d;
+  background: transparent;
+  color: #00ff9d;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  background-color: #00ff9d;
+  color: #0d0d0d;
+  box-shadow: 0 0 12px #00ff9d;
+}
+
+button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Botão de finalizar venda — estilo neon vermelho */
+#btnFinish {
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+
+#btnFinish:hover:not(:disabled) {
+  background-color: #ff4d4d;
+  color: #0d0d0d;
+  box-shadow: 0 0 12px #ff4d4d;
+}
+
+#btnFinish:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Input estilo leitor de código */
+#codeInput {
+  width: 300px;
+  padding: 12px;
+  font-size: 18px;
+  border: 2px solid #00b3ff;
+  background-color: #000;
+  color: #00b3ff;
+  border-radius: 6px;
+  outline: none;
+  text-align: center;
+  letter-spacing: 2px;
+  transition: 0.2s;
+}
+
+#codeInput:focus {
+  box-shadow: 0 0 12px #00b3ff;
+}
+
+/* Área futura para lista de itens */
+#itemsList {
+  margin-top: 40px;
+  width: 80%;
+  max-width: 600px;
+  border-top: 1px solid #333;
+  padding-top: 20px;
+  font-size: 16px;
+}
+#salePanel {
+  margin-top: 20px;
+  width: 80%;
+  max-width: 600px;
+  border-top: 1px solid #333;
+  padding-top: 20px;
+}
+
+#salePanel h2, #salePanel h3 {
+  color: #00ff9d;
+  text-shadow: 0 0 6px #00ff9d;
+}
+
+#salePanel p {
+  margin: 4px 0;
+}
+
+#itemsList {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+#itemsList li {
+  padding: 6px 0;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
